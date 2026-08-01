@@ -1,0 +1,20 @@
+{
+  "name": "majster-assistance",
+  "version": "0.1.0",
+  "description": "Aplikacja webowa wspomagająca remonty domowe oparta o LLM",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "Filip Ochał",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

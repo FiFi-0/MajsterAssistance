@@ -1,0 +1,2 @@
+-- Schemat bazy danych SQLite dla MajsterAssistance
+-- Tabele zostaną zdefiniowane w kroku "Baza danych" (użytkownicy, stawki, kosztorysy)
