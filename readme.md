@@ -30,5 +30,5 @@ System wspomagający niezależnych wykonawców (majstrów) oraz amatorów budowl
 * **Integracja AI:** OpenAI API / Gemini API (JSON Mode, Bring Your Own Key)
 
 ## 👤 Autor
-> *Filip Ochał*
-> *Promotor: dr hab. inż. Krzysztof Pancerz*
+* *Filip Ochał*
+* *Promotor: dr hab. inż. Krzysztof Pancerz*
