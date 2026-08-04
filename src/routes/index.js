@@ -1,5 +1,6 @@
 const express = require('express');
 const authRoutes = require('./authRoutes');
+const ratesRoutes = require('./ratesRoutes');
 const router = express.Router();
 
 router.get('/health', (req, res) => {
@@ -7,5 +8,6 @@ router.get('/health', (req, res) => {
 });
 
 router.use('/auth', authRoutes);
+router.use('/rates', ratesRoutes);
 
 module.exports = router;
