@@ -8,12 +8,41 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="bg-gray-50 text-gray-900">
-  <main class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-      <h1 class="text-3xl font-bold mb-2">MajsterAssistance 🛠️</h1>
-      <p class="text-gray-500" id="status">Sprawdzanie połączenia z serwerem...</p>
-    </div>
+  <main class="max-w-2xl mx-auto p-6">
+    <header class="mb-6 text-center">
+      <h1 class="text-3xl font-bold mb-1">MajsterAssistance 🛠️</h1>
+      <p class="text-gray-400 text-xs" id="status"></p>
+    </header>
+
+    <section class="bg-white rounded-lg shadow p-6 space-y-4">
+      <h2 class="text-xl font-semibold">Asystent Techniczny</h2>
+      <div>
+        <label class="block text-sm font-medium mb-1" for="apiKey">Twój klucz API Gemini</label>
+        <input type="password" id="apiKey" class="w-full border rounded px-3 py-2" placeholder="AIza..." />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1" for="jobDescription">Opisz prace do wykonania</label>
+        <textarea id="jobDescription" rows="4" class="w-full border rounded px-3 py-2" placeholder="np. Wymiana baterii łazienkowej i uszczelnienie fug"></textarea>
+      </div>
+      <button id="generateBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
+        Generuj checklistę
+      </button>
+      <p id="chatError" class="text-red-600 text-sm hidden"></p>
+    </section>
+
+    <section id="resultSection" class="mt-6 bg-white rounded-lg shadow p-6 hidden">
+      <h3 class="text-lg font-semibold mb-3" id="resultTitle"></h3>
+      <div>
+        <h4 class="font-medium mb-1">Checklista prac</h4>
+        <ul id="checklistItems" class="list-disc list-inside space-y-1"></ul>
+      </div>
+      <div class="mt-4">
+        <h4 class="font-medium mb-1">Materiały</h4>
+        <ul id="materialsItems" class="list-disc list-inside space-y-1"></ul>
+      </div>
+    </section>
   </main>
   <script src="js/main.js"></script>
+  <script src="js/chat.js"></script>
 </body>
 </html>
