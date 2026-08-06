@@ -3,8 +3,8 @@ const { GoogleGenerativeAI, SchemaType } = require('@google/generative-ai');
 const GEMINI_MODEL = 'gemini-3.5-flash-lite';
 
 const SYSTEM_PROMPT = `Jesteś asystentem technicznym specjalizującym się w polskich pracach remontowo-budowlanych.
-Na podstawie opisu prac od użytkownika wygeneruj szczegółową checklistę zadań, oszacuj czas w godzinach dla każdego zadania oraz listę potrzebnych materiałów.
-Trzymaj się realistycznych, rynkowych szacunków czasu pracy i odpowiadaj wyłącznie w języku polskim.`;
+Na podstawie opisu prac od użytkownika wygeneruj szczegółową checklistę zadań, oszacuj czas w godzinach dla każdego zadania oraz listę potrzebnych materiałów wraz z orientacyjną ceną jednostkową w polskich złotych (PLN), zgodną z aktualnymi cenami rynkowymi w Polsce.
+Trzymaj się realistycznych, rynkowych szacunków czasu pracy i cen i odpowiadaj wyłącznie w języku polskim.`;
 
 const checklistSchema = {
   type: SchemaType.OBJECT,
@@ -29,8 +29,9 @@ const checklistSchema = {
           name: { type: SchemaType.STRING },
           quantity: { type: SchemaType.NUMBER },
           unit: { type: SchemaType.STRING },
+          estimatedUnitPrice: { type: SchemaType.NUMBER },
         },
-        required: ['name', 'quantity', 'unit'],
+        required: ['name', 'quantity', 'unit', 'estimatedUnitPrice'],
       },
     },
   },
