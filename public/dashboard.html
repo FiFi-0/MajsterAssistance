@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MajsterAssistance — Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <header class="bg-white shadow">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="text-xl font-bold">MajsterAssistance 🛠️</a>
+      <nav id="nav" class="flex items-center gap-4"></nav>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-6">
+    <div id="app"></div>
+  </main>
+
+  <script src="js/dashboard/auth.js"></script>
+  <script src="js/dashboard/router.js"></script>
+  <script src="js/dashboard/api.js"></script>
+  <script src="js/dashboard/views/loginView.js"></script>
+  <script src="js/dashboard/views/ratesView.js"></script>
+  <script src="js/dashboard/views/estimatesView.js"></script>
+  <script src="js/dashboard/main.js"></script>
+</body>
+</html>
