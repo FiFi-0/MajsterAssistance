@@ -38,6 +38,36 @@ const checklistSchema = {
   required: ['jobTitle', 'checklist', 'materials'],
 };
 
+const MAX_TASK_HOURS = 500;
+const MAX_MATERIAL_QUANTITY = 10000;
+const MAX_MATERIAL_UNIT_PRICE = 200000;
+
+function validateChecklistResponse(data) {
+  const invalidTask = data.checklist.find(
+    (task) => !(task.estimatedHours > 0) || task.estimatedHours > MAX_TASK_HOURS
+  );
+  if (invalidTask) {
+    const error = new Error('Model AI zwrócił niepoprawny czas realizacji zadania');
+    error.status = 502;
+    throw error;
+  }
+
+  const invalidMaterial = data.materials.find(
+    (material) =>
+      !(material.quantity > 0) ||
+      material.quantity > MAX_MATERIAL_QUANTITY ||
+      material.estimatedUnitPrice < 0 ||
+      material.estimatedUnitPrice > MAX_MATERIAL_UNIT_PRICE
+  );
+  if (invalidMaterial) {
+    const error = new Error('Model AI zwrócił niepoprawne dane materiału');
+    error.status = 502;
+    throw error;
+  }
+
+  return data;
+}
+
 async function generateChecklist(apiKey, jobDescription) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
@@ -51,7 +81,7 @@ async function generateChecklist(apiKey, jobDescription) {
 
   try {
     const result = await model.generateContent(jobDescription);
-    return JSON.parse(result.response.text());
+    return validateChecklistResponse(JSON.parse(result.response.text()));
   } catch (error) {
     const safeError = new Error(error.message || 'Błąd komunikacji z modelem AI');
     safeError.status = 502;

@@ -1,8 +1,8 @@
 function errorHandler(err, req, res, next) {
   console.error(err.stack);
-  res.status(err.status || 500).json({
-    error: err.message || 'Wewnętrzny błąd serwera',
-  });
+  const status = err.status || 500;
+  const message = err.status ? err.message : 'Wewnętrzny błąd serwera';
+  res.status(status).json({ error: message });
 }
 
 module.exports = errorHandler;

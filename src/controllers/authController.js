@@ -8,6 +8,11 @@ function register(req, res, next) {
       error.status = 400;
       throw error;
     }
+    if (password.length < 8) {
+      const error = new Error('Hasło musi mieć co najmniej 8 znaków');
+      error.status = 400;
+      throw error;
+    }
 
     const result = authService.register({ email, password, fullName });
     res.status(201).json(result);
