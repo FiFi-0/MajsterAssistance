@@ -21,6 +21,7 @@ async function renderEstimatesView(container) {
 
   const categorySelect = container.querySelector('#estCategory');
   const submitBtn = container.querySelector('#estSubmitBtn');
+  container.querySelector('#estApiKey').value = getSavedApiKey();
   const rates = await apiFetch('/rates');
 
   if (rates.length === 0) {
@@ -76,6 +77,13 @@ async function renderEstimatesView(container) {
       row.addEventListener('click', async () => {
         if (details.classList.contains('hidden') && details.dataset.loaded !== 'true') {
           const full = await apiFetch(`/estimates/${estimate.id}`);
+
+          const totalHours = full.items.reduce((sum, item) => sum + item.labor_hours, 0);
+          const hoursLine = document.createElement('div');
+          hoursLine.className = 'font-medium';
+          hoursLine.textContent = `Łączny czas robocizny: ${totalHours} h`;
+          details.appendChild(hoursLine);
+
           full.items.forEach((item) => {
             const cost = item.labor_cost || item.material_cost;
             const line = document.createElement('div');
@@ -98,15 +106,19 @@ async function renderEstimatesView(container) {
     submitBtn.textContent = 'Generowanie...';
 
     try {
+      const apiKey = container.querySelector('#estApiKey').value.trim();
       const body = {
-        apiKey: container.querySelector('#estApiKey').value.trim(),
+        apiKey,
         jobDescription: container.querySelector('#estDescription').value.trim(),
         category: categorySelect.value,
         title: container.querySelector('#estTitle').value.trim() || undefined,
         clientName: container.querySelector('#estClient').value.trim() || undefined,
       };
       await apiFetch('/estimates/generate', { method: 'POST', body: JSON.stringify(body) });
+      saveApiKey(apiKey);
+      showToast('Kosztorys wygenerowany');
       form.reset();
+      container.querySelector('#estApiKey').value = apiKey;
       await loadEstimates();
     } catch (error) {
       errorEl.textContent = error.message;

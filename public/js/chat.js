@@ -4,8 +4,11 @@ const jobDescriptionInput = document.getElementById('jobDescription');
 const chatError = document.getElementById('chatError');
 const resultSection = document.getElementById('resultSection');
 const resultTitle = document.getElementById('resultTitle');
+const totalHoursEl = document.getElementById('totalHours');
 const checklistItems = document.getElementById('checklistItems');
 const materialsItems = document.getElementById('materialsItems');
+
+apiKeyInput.value = getSavedApiKey();
 
 function renderList(container, items, formatter) {
   container.innerHTML = '';
@@ -45,7 +48,11 @@ generateBtn.addEventListener('click', async () => {
       throw new Error(data.error || 'Wystąpił błąd');
     }
 
+    saveApiKey(apiKey);
+
+    const totalHours = data.checklist.reduce((sum, item) => sum + item.estimatedHours, 0);
     resultTitle.textContent = data.jobTitle;
+    totalHoursEl.textContent = `Łączny szacowany czas: ${totalHours} h`;
     renderList(checklistItems, data.checklist, (item) => `${item.task} (${item.estimatedHours} h)`);
     renderList(materialsItems, data.materials, (item) => `${item.name} — ${item.quantity} ${item.unit}`);
     resultSection.classList.remove('hidden');
