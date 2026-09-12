@@ -38,4 +38,13 @@ async function generate(req, res, next) {
   }
 }
 
-module.exports = { list, getOne, generate };
+function remove(req, res, next) {
+  try {
+    estimateService.deleteEstimate(req.userId, Number(req.params.id));
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { list, getOne, generate, remove };

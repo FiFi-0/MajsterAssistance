@@ -57,17 +57,33 @@ async function renderEstimatesView(container) {
       row.className = 'border rounded p-3 cursor-pointer hover:bg-gray-50';
 
       const header = document.createElement('div');
-      header.className = 'flex justify-between items-center';
+      header.className = 'flex justify-between items-center gap-3';
 
       const titleSpan = document.createElement('span');
       titleSpan.className = 'font-medium';
       titleSpan.textContent = estimate.title;
 
+      const rightSide = document.createElement('div');
+      rightSide.className = 'flex items-center gap-3';
+
       const totalSpan = document.createElement('span');
       totalSpan.textContent = `${estimate.total_cost.toFixed(2)} zł`;
 
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.textContent = 'Usuń';
+      deleteBtn.className = 'text-red-600 hover:underline text-sm';
+      deleteBtn.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        await apiFetch(`/estimates/${estimate.id}`, { method: 'DELETE' });
+        showToast('Kosztorys usunięty');
+        await loadEstimates();
+      });
+
+      rightSide.appendChild(totalSpan);
+      rightSide.appendChild(deleteBtn);
       header.appendChild(titleSpan);
-      header.appendChild(totalSpan);
+      header.appendChild(rightSide);
       row.appendChild(header);
 
       const details = document.createElement('div');

@@ -22,6 +22,11 @@ function getEstimate(userId, estimateId) {
   return { ...estimate, items };
 }
 
+function deleteEstimate(userId, estimateId) {
+  assertOwnedEstimate(userId, estimateId);
+  estimateModel.deleteEstimate(estimateId);
+}
+
 async function generateEstimate(userId, { apiKey, jobDescription, category, title, clientName }) {
   const rate = rateModel.findRatesByUser(userId).find((r) => r.category === category);
   if (!rate) {
@@ -73,4 +78,4 @@ async function generateEstimate(userId, { apiKey, jobDescription, category, titl
   return { ...updatedEstimate, items };
 }
 
-module.exports = { listEstimates, getEstimate, generateEstimate };
+module.exports = { listEstimates, getEstimate, generateEstimate, deleteEstimate };
