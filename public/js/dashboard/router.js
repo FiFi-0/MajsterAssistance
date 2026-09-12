@@ -12,7 +12,8 @@ function createNavLink(label, path) {
   const a = document.createElement('a');
   a.textContent = label;
   a.href = `#${path}`;
-  a.className = 'text-blue-600 hover:underline';
+  const isActive = (window.location.hash.slice(1) || '/rates') === path;
+  a.className = isActive ? 'text-blue-800 font-semibold underline' : 'text-blue-600 hover:underline';
   return a;
 }
 
@@ -29,11 +30,20 @@ function renderNav() {
   nav.innerHTML = '';
 
   if (isAuthenticated()) {
+    const user = getUser();
+    if (user) {
+      const userLabel = document.createElement('span');
+      userLabel.textContent = `Zalogowano jako: ${user.full_name}`;
+      userLabel.className = 'text-sm text-gray-500 mr-2';
+      nav.appendChild(userLabel);
+    }
+
     nav.appendChild(createNavLink('Stawki', '/rates'));
     nav.appendChild(createNavLink('Kosztorysy', '/estimates'));
     nav.appendChild(
       createNavButton('Wyloguj', () => {
         clearToken();
+        clearUser();
         navigate('/login');
       })
     );

@@ -11,6 +11,7 @@ async function apiFetch(path, options = {}) {
   if (!response.ok) {
     if (response.status === 401) {
       clearToken();
+      clearUser();
       navigate('/login');
     }
     throw new Error(data.error || 'Wystąpił błąd');

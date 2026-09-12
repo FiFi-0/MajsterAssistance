@@ -58,6 +58,7 @@ function renderLoginView(container) {
       const body = mode === 'register' ? { email, password, fullName } : { email, password };
       const data = await apiFetch(path, { method: 'POST', body: JSON.stringify(body) });
       setToken(data.token);
+      setUser(data.user);
       navigate('/rates');
     } catch (error) {
       errorEl.textContent = error.message;
