@@ -78,6 +78,7 @@ async function renderRatesView(container) {
       deleteBtn.className = 'text-red-600 hover:underline text-sm';
       deleteBtn.addEventListener('click', async () => {
         await apiFetch(`/rates/${rate.id}`, { method: 'DELETE' });
+        showToast('Stawka usunięta');
         await loadRates();
       });
 
@@ -106,8 +107,10 @@ async function renderRatesView(container) {
     try {
       if (id) {
         await apiFetch(`/rates/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+        showToast('Stawka zaktualizowana');
       } else {
         await apiFetch('/rates', { method: 'POST', body: JSON.stringify(body) });
+        showToast('Stawka dodana');
       }
       resetForm();
       await loadRates();
