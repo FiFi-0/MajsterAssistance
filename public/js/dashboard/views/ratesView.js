@@ -1,10 +1,15 @@
+const NEW_CATEGORY_VALUE = '__new__';
+
 async function renderRatesView(container) {
   container.innerHTML = `
     <section class="bg-white rounded-lg shadow p-6 space-y-4">
       <h2 class="text-xl font-semibold">Twoje stawki</h2>
       <form id="rateForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <input type="hidden" id="rateId" />
-        <input type="text" id="rateCategory" placeholder="Kategoria (np. hydraulika)" class="border rounded px-3 py-2" required />
+        <div>
+          <select id="rateCategorySelect" class="w-full border rounded px-3 py-2" required></select>
+          <input type="text" id="rateCategoryNew" placeholder="Nazwa nowej kategorii" class="w-full border rounded px-3 py-2 mt-2 hidden" />
+        </div>
         <input type="number" id="rateHourly" placeholder="Stawka godzinowa (PLN)" class="border rounded px-3 py-2" step="0.01" required />
         <input type="number" id="rateMarkup" placeholder="Narzut na materiały (%)" class="border rounded px-3 py-2" step="0.01" value="0" />
         <button type="submit" id="rateSubmitBtn" class="bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-700">Dodaj stawkę</button>
@@ -29,19 +34,47 @@ async function renderRatesView(container) {
   const tbody = container.querySelector('#ratesTableBody');
   const submitBtn = container.querySelector('#rateSubmitBtn');
   const idInput = container.querySelector('#rateId');
-  const categoryInput = container.querySelector('#rateCategory');
+  const categorySelect = container.querySelector('#rateCategorySelect');
+  const categoryNewInput = container.querySelector('#rateCategoryNew');
   const hourlyInput = container.querySelector('#rateHourly');
   const markupInput = container.querySelector('#rateMarkup');
+
+  function updateCategoryNewVisibility() {
+    const isNew = categorySelect.value === NEW_CATEGORY_VALUE;
+    categoryNewInput.classList.toggle('hidden', !isNew);
+    categoryNewInput.required = isNew;
+  }
+
+  function populateCategorySelect(categories) {
+    categorySelect.innerHTML = '';
+    categories.forEach((category) => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.textContent = category;
+      categorySelect.appendChild(option);
+    });
+    const newOption = document.createElement('option');
+    newOption.value = NEW_CATEGORY_VALUE;
+    newOption.textContent = '+ Nowa kategoria';
+    categorySelect.appendChild(newOption);
+    updateCategoryNewVisibility();
+  }
+
+  categorySelect.addEventListener('change', updateCategoryNewVisibility);
 
   function resetForm() {
     form.reset();
     idInput.value = '';
     submitBtn.textContent = 'Dodaj stawkę';
+    updateCategoryNewVisibility();
   }
 
   async function loadRates() {
     const rates = await apiFetch('/rates');
     tbody.innerHTML = '';
+
+    const categories = [...new Set(rates.map((rate) => rate.category))];
+    populateCategorySelect(categories);
 
     rates.forEach((rate) => {
       const tr = document.createElement('tr');
@@ -66,7 +99,8 @@ async function renderRatesView(container) {
       editBtn.className = 'text-blue-600 hover:underline text-sm';
       editBtn.addEventListener('click', () => {
         idInput.value = rate.id;
-        categoryInput.value = rate.category;
+        categorySelect.value = rate.category;
+        updateCategoryNewVisibility();
         hourlyInput.value = rate.hourly_rate;
         markupInput.value = rate.material_markup_percent;
         submitBtn.textContent = 'Zapisz zmiany';
@@ -98,8 +132,17 @@ async function renderRatesView(container) {
     errorEl.classList.add('hidden');
 
     const id = idInput.value;
+    const category =
+      categorySelect.value === NEW_CATEGORY_VALUE ? categoryNewInput.value.trim() : categorySelect.value;
+
+    if (!category) {
+      errorEl.textContent = 'Podaj nazwę kategorii';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
     const body = {
-      category: categoryInput.value.trim(),
+      category,
       hourlyRate: Number(hourlyInput.value),
       materialMarkupPercent: Number(markupInput.value),
     };
