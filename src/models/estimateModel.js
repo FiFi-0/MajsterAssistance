@@ -23,6 +23,14 @@ function updateEstimateTotal(id, totalCost) {
   return findEstimateById(id);
 }
 
+function updateEstimateStatus(id, status) {
+  db.prepare("UPDATE estimates SET status = ?, updated_at = datetime('now') WHERE id = ?").run(
+    status,
+    id
+  );
+  return findEstimateById(id);
+}
+
 function deleteEstimate(id) {
   db.prepare('DELETE FROM estimates WHERE id = ?').run(id);
 }
@@ -46,6 +54,7 @@ module.exports = {
   findEstimateById,
   findEstimatesByUser,
   updateEstimateTotal,
+  updateEstimateStatus,
   deleteEstimate,
   addEstimateItem,
   findItemsByEstimate,

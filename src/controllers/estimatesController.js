@@ -47,4 +47,20 @@ function remove(req, res, next) {
   }
 }
 
-module.exports = { list, getOne, generate, remove };
+function updateStatus(req, res, next) {
+  try {
+    const { status } = req.body;
+    if (!status) {
+      const error = new Error('Status jest wymagany');
+      error.status = 400;
+      throw error;
+    }
+
+    const estimate = estimateService.updateStatus(req.userId, Number(req.params.id), status);
+    res.json(estimate);
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { list, getOne, generate, remove, updateStatus };

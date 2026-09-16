@@ -27,6 +27,18 @@ function deleteEstimate(userId, estimateId) {
   estimateModel.deleteEstimate(estimateId);
 }
 
+const ALLOWED_STATUSES = ['draft', 'sent', 'accepted', 'rejected'];
+
+function updateStatus(userId, estimateId, status) {
+  if (!ALLOWED_STATUSES.includes(status)) {
+    const error = new Error('Nieprawidłowy status kosztorysu');
+    error.status = 400;
+    throw error;
+  }
+  assertOwnedEstimate(userId, estimateId);
+  return estimateModel.updateEstimateStatus(estimateId, status);
+}
+
 async function generateEstimate(userId, { apiKey, jobDescription, category, title, clientName }) {
   const rate = rateModel.findRatesByUser(userId).find((r) => r.category === category);
   if (!rate) {
@@ -78,4 +90,4 @@ async function generateEstimate(userId, { apiKey, jobDescription, category, titl
   return { ...updatedEstimate, items };
 }
 
-module.exports = { listEstimates, getEstimate, generateEstimate, deleteEstimate };
+module.exports = { listEstimates, getEstimate, generateEstimate, deleteEstimate, updateStatus };

@@ -1,3 +1,17 @@
+const ESTIMATE_STATUS_LABELS = {
+  draft: 'Szkic',
+  sent: 'Wysłany',
+  accepted: 'Zaakceptowany',
+  rejected: 'Odrzucony',
+};
+
+const ESTIMATE_STATUS_COLORS = {
+  draft: 'bg-gray-100 text-gray-700',
+  sent: 'bg-blue-100 text-blue-700',
+  accepted: 'bg-green-100 text-green-700',
+  rejected: 'bg-red-100 text-red-700',
+};
+
 async function renderEstimatesView(container) {
   container.innerHTML = `
     <section class="bg-white rounded-lg shadow p-6 space-y-4">
@@ -69,6 +83,29 @@ async function renderEstimatesView(container) {
       const totalSpan = document.createElement('span');
       totalSpan.textContent = `${estimate.total_cost.toFixed(2)} zł`;
 
+      const statusSelect = document.createElement('select');
+      statusSelect.className = `text-xs rounded px-2 py-1 border-0 ${
+        ESTIMATE_STATUS_COLORS[estimate.status] || ESTIMATE_STATUS_COLORS.draft
+      }`;
+      Object.entries(ESTIMATE_STATUS_LABELS).forEach(([value, label]) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        option.selected = value === estimate.status;
+        statusSelect.appendChild(option);
+      });
+      statusSelect.addEventListener('click', (event) => event.stopPropagation());
+      statusSelect.addEventListener('change', async () => {
+        await apiFetch(`/estimates/${estimate.id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: statusSelect.value }),
+        });
+        statusSelect.className = `text-xs rounded px-2 py-1 border-0 ${
+          ESTIMATE_STATUS_COLORS[statusSelect.value] || ESTIMATE_STATUS_COLORS.draft
+        }`;
+        showToast('Status zaktualizowany');
+      });
+
       const deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
       deleteBtn.textContent = 'Usuń';
@@ -80,6 +117,7 @@ async function renderEstimatesView(container) {
         await loadEstimates();
       });
 
+      rightSide.appendChild(statusSelect);
       rightSide.appendChild(totalSpan);
       rightSide.appendChild(deleteBtn);
       header.appendChild(titleSpan);
