@@ -27,6 +27,62 @@ function deleteEstimate(userId, estimateId) {
   estimateModel.deleteEstimate(estimateId);
 }
 
+function assertOwnedItem(estimateId, itemId) {
+  const item = estimateModel.findEstimateItemById(itemId);
+  if (!item || item.estimate_id !== estimateId) {
+    const error = new Error('Pozycja kosztorysu nie została znaleziona');
+    error.status = 404;
+    throw error;
+  }
+  return item;
+}
+
+function recalculateEstimateTotal(estimateId) {
+  const items = estimateModel.findItemsByEstimate(estimateId);
+  const total = items.reduce((sum, item) => sum + item.total_cost, 0);
+  return estimateModel.updateEstimateTotal(estimateId, total);
+}
+
+function withRecalculatedItems(estimateId) {
+  return {
+    estimate: recalculateEstimateTotal(estimateId),
+    items: estimateModel.findItemsByEstimate(estimateId),
+  };
+}
+
+function addItem(userId, estimateId, { description, laborHours, laborCost, materialCost }) {
+  assertOwnedEstimate(userId, estimateId);
+  estimateModel.addEstimateItem({
+    estimateId,
+    description,
+    laborHours,
+    laborCost,
+    materialCost,
+    totalCost: laborCost + materialCost,
+  });
+  return withRecalculatedItems(estimateId);
+}
+
+function updateItem(userId, estimateId, itemId, { description, laborHours, laborCost, materialCost }) {
+  assertOwnedEstimate(userId, estimateId);
+  assertOwnedItem(estimateId, itemId);
+  estimateModel.updateEstimateItem(itemId, {
+    description,
+    laborHours,
+    laborCost,
+    materialCost,
+    totalCost: laborCost + materialCost,
+  });
+  return withRecalculatedItems(estimateId);
+}
+
+function deleteItem(userId, estimateId, itemId) {
+  assertOwnedEstimate(userId, estimateId);
+  assertOwnedItem(estimateId, itemId);
+  estimateModel.deleteEstimateItem(itemId);
+  return withRecalculatedItems(estimateId);
+}
+
 const ALLOWED_STATUSES = ['draft', 'sent', 'accepted', 'rejected'];
 
 function updateStatus(userId, estimateId, status) {
@@ -90,4 +146,13 @@ async function generateEstimate(userId, { apiKey, jobDescription, category, titl
   return { ...updatedEstimate, items };
 }
 
-module.exports = { listEstimates, getEstimate, generateEstimate, deleteEstimate, updateStatus };
+module.exports = {
+  listEstimates,
+  getEstimate,
+  generateEstimate,
+  deleteEstimate,
+  updateStatus,
+  addItem,
+  updateItem,
+  deleteItem,
+};

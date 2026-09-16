@@ -49,6 +49,21 @@ function findItemsByEstimate(estimateId) {
   return db.prepare('SELECT * FROM estimate_items WHERE estimate_id = ?').all(estimateId);
 }
 
+function findEstimateItemById(id) {
+  return db.prepare('SELECT * FROM estimate_items WHERE id = ?').get(id);
+}
+
+function updateEstimateItem(id, { description, laborHours, laborCost, materialCost, totalCost }) {
+  db.prepare(
+    'UPDATE estimate_items SET description = ?, labor_hours = ?, labor_cost = ?, material_cost = ?, total_cost = ? WHERE id = ?'
+  ).run(description, laborHours, laborCost, materialCost, totalCost, id);
+  return findEstimateItemById(id);
+}
+
+function deleteEstimateItem(id) {
+  db.prepare('DELETE FROM estimate_items WHERE id = ?').run(id);
+}
+
 module.exports = {
   createEstimate,
   findEstimateById,
@@ -58,4 +73,7 @@ module.exports = {
   deleteEstimate,
   addEstimateItem,
   findItemsByEstimate,
+  findEstimateItemById,
+  updateEstimateItem,
+  deleteEstimateItem,
 };
