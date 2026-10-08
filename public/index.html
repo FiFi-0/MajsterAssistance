@@ -4,48 +4,48 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MajsterAssistance</title>
+  <script src="js/theme-init.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="bg-gray-50 text-gray-900">
-  <main class="max-w-2xl mx-auto p-6">
-    <header class="mb-6 text-center">
-      <h1 class="text-3xl font-bold mb-1">MajsterAssistance 🛠️</h1>
-      <p class="text-gray-400 text-xs" id="status"></p>
-      <a href="dashboard.html" class="text-blue-600 text-sm hover:underline">Panel Majstra (logowanie)</a>
-    </header>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+  <header class="border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="#/chat" class="text-xl font-bold flex items-center gap-2">
+        <span>🛠️</span>
+        <span>MajsterAssistance</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <nav id="nav" class="flex items-center gap-4"></nav>
+        <button id="themeToggle" type="button" aria-label="Przełącz motyw" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <section class="bg-white rounded-lg shadow p-6 space-y-4">
-      <h2 class="text-xl font-semibold">Asystent Techniczny</h2>
-      <div>
-        <label class="block text-sm font-medium mb-1" for="apiKey">Twój klucz API Gemini</label>
-        <input type="password" id="apiKey" class="w-full border rounded px-3 py-2" placeholder="AIza..." />
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1" for="jobDescription">Opisz prace do wykonania</label>
-        <textarea id="jobDescription" rows="4" class="w-full border rounded px-3 py-2" placeholder="np. Wymiana baterii łazienkowej i uszczelnienie fug"></textarea>
-      </div>
-      <button id="generateBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
-        Generuj checklistę
-      </button>
-      <p id="chatError" class="text-red-600 text-sm hidden"></p>
-    </section>
-
-    <section id="resultSection" class="mt-6 bg-white rounded-lg shadow p-6 hidden">
-      <h3 class="text-lg font-semibold mb-1" id="resultTitle"></h3>
-      <p class="text-sm text-gray-500 mb-3" id="totalHours"></p>
-      <div>
-        <h4 class="font-medium mb-1">Checklista prac</h4>
-        <ul id="checklistItems" class="list-disc list-inside space-y-1"></ul>
-      </div>
-      <div class="mt-4">
-        <h4 class="font-medium mb-1">Materiały</h4>
-        <ul id="materialsItems" class="list-disc list-inside space-y-1"></ul>
-      </div>
-    </section>
+  <main class="max-w-4xl mx-auto p-6">
+    <div id="app"></div>
   </main>
+
+  <div id="toastContainer" class="fixed bottom-4 right-4 flex flex-col gap-2 z-50"></div>
+
   <script src="js/apiKeyStorage.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/chat.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/dashboard/auth.js"></script>
+  <script src="js/dashboard/router.js"></script>
+  <script src="js/dashboard/api.js"></script>
+  <script src="js/dashboard/toast.js"></script>
+  <script src="js/dashboard/views/chatView.js"></script>
+  <script src="js/dashboard/views/loginView.js"></script>
+  <script src="js/dashboard/views/ratesView.js"></script>
+  <script src="js/dashboard/views/estimatesView.js"></script>
+  <script src="js/dashboard/main.js"></script>
 </body>
 </html>

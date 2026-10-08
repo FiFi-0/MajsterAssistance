@@ -1,4 +1,5 @@
 const routes = {};
+const DEFAULT_ROUTE = '/chat';
 
 function registerRoute(path, renderFn, { requiresAuth = false } = {}) {
   routes[path] = { renderFn, requiresAuth };
@@ -12,15 +13,17 @@ function createNavLink(label, path) {
   const a = document.createElement('a');
   a.textContent = label;
   a.href = `#${path}`;
-  const isActive = (window.location.hash.slice(1) || '/rates') === path;
-  a.className = isActive ? 'text-blue-800 font-semibold underline' : 'text-blue-600 hover:underline';
+  const isActive = (window.location.hash.slice(1) || DEFAULT_ROUTE) === path;
+  a.className = isActive
+    ? 'text-amber-700 dark:text-amber-400 font-semibold underline'
+    : 'text-amber-600 dark:text-amber-500 hover:underline';
   return a;
 }
 
 function createNavButton(label, onClick) {
   const button = document.createElement('button');
   button.textContent = label;
-  button.className = 'text-red-600 hover:underline';
+  button.className = 'text-red-600 dark:text-red-400 hover:underline';
   button.addEventListener('click', onClick);
   return button;
 }
@@ -29,12 +32,14 @@ function renderNav() {
   const nav = document.getElementById('nav');
   nav.innerHTML = '';
 
+  nav.appendChild(createNavLink('Asystent', '/chat'));
+
   if (isAuthenticated()) {
     const user = getUser();
     if (user) {
       const userLabel = document.createElement('span');
       userLabel.textContent = `Zalogowano jako: ${user.full_name}`;
-      userLabel.className = 'text-sm text-gray-500 mr-2';
+      userLabel.className = 'text-sm text-gray-500 dark:text-gray-400 mr-2';
       nav.appendChild(userLabel);
     }
 
@@ -53,8 +58,8 @@ function renderNav() {
 }
 
 async function renderRoute() {
-  const path = window.location.hash.slice(1) || '/rates';
-  const route = routes[path] || routes['/rates'];
+  const path = window.location.hash.slice(1) || DEFAULT_ROUTE;
+  const route = routes[path] || routes[DEFAULT_ROUTE];
 
   if (route.requiresAuth && !isAuthenticated()) {
     navigate('/login');
