@@ -18,19 +18,25 @@ const ICON_CLIPBOARD =
 const ICON_ARCHIVE_BOX =
   '<svg class="w-6 h-6 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>';
 
+function roundMoney(value) {
+  return Math.round(value * 100) / 100;
+}
+
 function createItemField(type, value, placeholder, extraClass, step) {
   const input = document.createElement('input');
   input.type = type;
   if (type === 'number') {
     input.step = step || '1';
   }
-  if (value !== undefined) {
+  if (value !== undefined && value !== 0) {
     input.value = value;
+  } else if (type === 'number') {
+    input.placeholder = '0';
   }
   if (placeholder) {
     input.placeholder = placeholder;
   }
-  input.className = `border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${extraClass || ''}`;
+  input.className = `border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded px-2 py-1 text-sm w-full placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${extraClass || ''}`;
   return input;
 }
 
@@ -73,10 +79,10 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
     itemRow.className = 'grid grid-cols-5 gap-2 items-center';
 
     const hoursInput = createItemField('number', item.labor_hours, '', '', '0.5');
-    const initialRate = item.labor_hours > 0 ? Math.round((item.labor_cost / item.labor_hours) * 100) / 100 : 0;
+    const initialRate = item.labor_hours > 0 ? roundMoney(item.labor_cost / item.labor_hours) : 0;
     const rateInput = createItemField('number', initialRate, '', '', '1');
     const laborCostDisplay = createReadOnlyCostField();
-    const materialCostInput = createItemField('number', item.material_cost, '', '', '1');
+    const materialCostInput = createItemField('number', roundMoney(item.material_cost), '', '', '1');
 
     function refreshLaborCostDisplay() {
       const computed = (Number(hoursInput.value) || 0) * (Number(rateInput.value) || 0);
@@ -97,7 +103,7 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
     saveBtn.addEventListener('click', async (event) => {
       event.stopPropagation();
       const laborHours = Number(hoursInput.value) || 0;
-      const laborCost = laborHours * (Number(rateInput.value) || 0);
+      const laborCost = roundMoney(laborHours * (Number(rateInput.value) || 0));
       const result = await apiFetch(`/estimates/${estimateId}/items/${item.id}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -170,7 +176,7 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
       return;
     }
     const laborHours = Number(newHours.value) || 0;
-    const laborCost = laborHours * (Number(newRate.value) || 0);
+    const laborCost = roundMoney(laborHours * (Number(newRate.value) || 0));
     const result = await apiFetch(`/estimates/${estimateId}/items`, {
       method: 'POST',
       body: JSON.stringify({

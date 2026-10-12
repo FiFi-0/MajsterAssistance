@@ -2,6 +2,10 @@ const estimateModel = require('../models/estimateModel');
 const rateModel = require('../models/rateModel');
 const llmService = require('./llmService');
 
+function roundMoney(value) {
+  return Math.round(value * 100) / 100;
+}
+
 function assertOwnedEstimate(userId, estimateId) {
   const estimate = estimateModel.findEstimateById(estimateId);
   if (!estimate || estimate.user_id !== userId) {
@@ -40,7 +44,7 @@ function assertOwnedItem(estimateId, itemId) {
 function recalculateEstimateTotal(estimateId) {
   const items = estimateModel.findItemsByEstimate(estimateId);
   const total = items.reduce((sum, item) => sum + item.total_cost, 0);
-  return estimateModel.updateEstimateTotal(estimateId, total);
+  return estimateModel.updateEstimateTotal(estimateId, roundMoney(total));
 }
 
 function withRecalculatedItems(estimateId) {
@@ -52,13 +56,15 @@ function withRecalculatedItems(estimateId) {
 
 function addItem(userId, estimateId, { description, laborHours, laborCost, materialCost }) {
   assertOwnedEstimate(userId, estimateId);
+  const roundedLaborCost = roundMoney(laborCost);
+  const roundedMaterialCost = roundMoney(materialCost);
   estimateModel.addEstimateItem({
     estimateId,
     description,
     laborHours,
-    laborCost,
-    materialCost,
-    totalCost: laborCost + materialCost,
+    laborCost: roundedLaborCost,
+    materialCost: roundedMaterialCost,
+    totalCost: roundMoney(roundedLaborCost + roundedMaterialCost),
   });
   return withRecalculatedItems(estimateId);
 }
@@ -66,12 +72,14 @@ function addItem(userId, estimateId, { description, laborHours, laborCost, mater
 function updateItem(userId, estimateId, itemId, { description, laborHours, laborCost, materialCost }) {
   assertOwnedEstimate(userId, estimateId);
   assertOwnedItem(estimateId, itemId);
+  const roundedLaborCost = roundMoney(laborCost);
+  const roundedMaterialCost = roundMoney(materialCost);
   estimateModel.updateEstimateItem(itemId, {
     description,
     laborHours,
-    laborCost,
-    materialCost,
-    totalCost: laborCost + materialCost,
+    laborCost: roundedLaborCost,
+    materialCost: roundedMaterialCost,
+    totalCost: roundMoney(roundedLaborCost + roundedMaterialCost),
   });
   return withRecalculatedItems(estimateId);
 }
@@ -114,7 +122,7 @@ async function generateEstimate(userId, { apiKey, jobDescription, category, titl
   let total = 0;
 
   checklist.forEach((task) => {
-    const laborCost = task.estimatedHours * rate.hourly_rate;
+    const laborCost = roundMoney(task.estimatedHours * rate.hourly_rate);
     total += laborCost;
     estimateModel.addEstimateItem({
       estimateId: estimate.id,
@@ -127,8 +135,9 @@ async function generateEstimate(userId, { apiKey, jobDescription, category, titl
   });
 
   materials.forEach((material) => {
-    const materialCost =
-      material.quantity * material.estimatedUnitPrice * (1 + rate.material_markup_percent / 100);
+    const materialCost = roundMoney(
+      material.quantity * material.estimatedUnitPrice * (1 + rate.material_markup_percent / 100)
+    );
     total += materialCost;
     estimateModel.addEstimateItem({
       estimateId: estimate.id,
@@ -140,7 +149,7 @@ async function generateEstimate(userId, { apiKey, jobDescription, category, titl
     });
   });
 
-  const updatedEstimate = estimateModel.updateEstimateTotal(estimate.id, total);
+  const updatedEstimate = estimateModel.updateEstimateTotal(estimate.id, roundMoney(total));
   const items = estimateModel.findItemsByEstimate(estimate.id);
 
   return { ...updatedEstimate, items };
