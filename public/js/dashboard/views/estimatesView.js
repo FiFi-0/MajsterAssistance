@@ -6,11 +6,17 @@ const ESTIMATE_STATUS_LABELS = {
 };
 
 const ESTIMATE_STATUS_COLORS = {
-  draft: 'bg-gray-100 text-gray-700',
-  sent: 'bg-blue-100 text-blue-700',
-  accepted: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-700',
+  draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+  sent: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+  accepted: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+  rejected: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
 };
+
+const ICON_CLIPBOARD =
+  '<svg class="w-6 h-6 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" /></svg>';
+
+const ICON_ARCHIVE_BOX =
+  '<svg class="w-6 h-6 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>';
 
 function createItemField(type, value, placeholder, extraClass, step) {
   const input = document.createElement('input');
@@ -24,7 +30,7 @@ function createItemField(type, value, placeholder, extraClass, step) {
   if (placeholder) {
     input.placeholder = placeholder;
   }
-  input.className = `border rounded px-2 py-1 text-sm w-full ${extraClass || ''}`;
+  input.className = `border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${extraClass || ''}`;
   return input;
 }
 
@@ -32,7 +38,8 @@ function createReadOnlyCostField() {
   const input = document.createElement('input');
   input.type = 'text';
   input.disabled = true;
-  input.className = 'border rounded px-2 py-1 text-sm w-full bg-gray-100 text-gray-500';
+  input.className =
+    'border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-sm w-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400';
   return input;
 }
 
@@ -48,7 +55,7 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
   details.appendChild(hoursLine);
 
   const headerRow = document.createElement('div');
-  headerRow.className = 'grid grid-cols-5 gap-2 text-xs text-gray-400 mb-1';
+  headerRow.className = 'grid grid-cols-5 gap-2 text-xs text-gray-400 dark:text-gray-500 mb-1';
   ['Godz.', 'Stawka (zł/h)', 'Robocizna (zł)', 'Materiał (zł)', ''].forEach((text) => {
     const cell = document.createElement('span');
     cell.textContent = text;
@@ -58,7 +65,7 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
 
   full.items.forEach((item) => {
     const itemBlock = document.createElement('div');
-    itemBlock.className = 'border rounded p-2 mb-2';
+    itemBlock.className = 'border border-gray-200 dark:border-gray-700 rounded p-2 mb-2';
 
     const descInput = createItemField('text', item.description, '', 'w-full mb-2');
 
@@ -80,12 +87,13 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
     rateInput.addEventListener('input', refreshLaborCostDisplay);
 
     const actions = document.createElement('div');
-    actions.className = 'flex gap-2';
+    actions.className = 'flex gap-1';
 
     const saveBtn = document.createElement('button');
     saveBtn.type = 'button';
-    saveBtn.textContent = 'Zapisz';
-    saveBtn.className = 'text-blue-600 hover:underline text-sm';
+    saveBtn.setAttribute('aria-label', 'Zapisz pozycję');
+    saveBtn.className = ICON_BUTTON_CLASS;
+    saveBtn.innerHTML = ICON_CHECK;
     saveBtn.addEventListener('click', async (event) => {
       event.stopPropagation();
       const laborHours = Number(hoursInput.value) || 0;
@@ -106,8 +114,9 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
 
     const deleteItemBtn = document.createElement('button');
     deleteItemBtn.type = 'button';
-    deleteItemBtn.textContent = 'Usuń';
-    deleteItemBtn.className = 'text-red-600 hover:underline text-sm';
+    deleteItemBtn.setAttribute('aria-label', 'Usuń pozycję');
+    deleteItemBtn.className = `${ICON_BUTTON_CLASS} text-red-600 dark:text-red-400`;
+    deleteItemBtn.innerHTML = ICON_TRASH;
     deleteItemBtn.addEventListener('click', async (event) => {
       event.stopPropagation();
       const result = await apiFetch(`/estimates/${estimateId}/items/${item.id}`, { method: 'DELETE' });
@@ -131,7 +140,7 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
   });
 
   const addBlock = document.createElement('div');
-  addBlock.className = 'mt-3 pt-3 border-t';
+  addBlock.className = 'mt-3 pt-3 border-t border-gray-200 dark:border-gray-700';
 
   const addRow = document.createElement('div');
   addRow.className = 'grid grid-cols-5 gap-2 items-center';
@@ -152,8 +161,9 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
 
   const addBtn = document.createElement('button');
   addBtn.type = 'button';
-  addBtn.textContent = '+ Dodaj';
-  addBtn.className = 'text-green-600 hover:underline text-sm';
+  addBtn.setAttribute('aria-label', 'Dodaj pozycję');
+  addBtn.className = `${ICON_BUTTON_CLASS} text-green-600 dark:text-green-500`;
+  addBtn.innerHTML = ICON_PLUS_CIRCLE;
   addBtn.addEventListener('click', async (event) => {
     event.stopPropagation();
     if (!newDesc.value.trim()) {
@@ -188,22 +198,32 @@ async function renderItemsEditor(details, estimateId, totalSpan) {
 
 async function renderEstimatesView(container) {
   container.innerHTML = `
-    <section class="bg-white rounded-lg shadow p-6 space-y-4">
-      <h2 class="text-xl font-semibold">Nowy kosztorys</h2>
+    <section class="${CARD_CLASS} space-y-4">
+      <div class="flex items-center gap-2">
+        ${ICON_CLIPBOARD}
+        <h2 class="text-xl font-semibold">Nowy kosztorys</h2>
+      </div>
       <form id="estimateForm" class="space-y-3">
-        <input type="password" id="estApiKey" placeholder="Twój klucz API Gemini" class="w-full border rounded px-3 py-2" required />
-        <select id="estCategory" class="w-full border rounded px-3 py-2" required></select>
-        <input type="text" id="estTitle" placeholder="Tytuł kosztorysu (opcjonalnie)" class="w-full border rounded px-3 py-2" />
-        <input type="text" id="estClient" placeholder="Klient (opcjonalnie)" class="w-full border rounded px-3 py-2" />
-        <textarea id="estDescription" rows="3" placeholder="Opisz prace do wykonania" class="w-full border rounded px-3 py-2" required></textarea>
-        <button type="submit" id="estSubmitBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">Generuj kosztorys</button>
+        <input type="password" id="estApiKey" placeholder="Twój klucz API Gemini" class="${INPUT_CLASS}" required />
+        <select id="estCategory" class="${INPUT_CLASS}" required></select>
+        <input type="text" id="estTitle" placeholder="Tytuł kosztorysu (opcjonalnie)" class="${INPUT_CLASS}" />
+        <input type="text" id="estClient" placeholder="Klient (opcjonalnie)" class="${INPUT_CLASS}" />
+        <textarea id="estDescription" rows="3" placeholder="Opisz prace do wykonania" class="${INPUT_CLASS}" required></textarea>
+        <button type="submit" id="estSubmitBtn" class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 disabled:opacity-50 flex items-center justify-center gap-2 w-full">
+          ${ICON_CLIPBOARD}
+          <span>Generuj kosztorys</span>
+        </button>
       </form>
-      <p id="estError" class="text-red-600 text-sm hidden"></p>
+      <p id="estError" class="text-red-600 dark:text-red-400 text-sm hidden"></p>
     </section>
 
-    <section class="mt-6 bg-white rounded-lg shadow p-6">
-      <h2 class="text-xl font-semibold mb-3">Zapisane kosztorysy</h2>
+    <section class="mt-6 ${CARD_CLASS}">
+      <div class="flex items-center gap-2 mb-3">
+        ${ICON_ARCHIVE_BOX}
+        <h2 class="text-xl font-semibold">Zapisane kosztorysy</h2>
+      </div>
       <div id="estimatesList" class="space-y-2"></div>
+      <p id="estimatesEmpty" class="text-sm text-gray-500 dark:text-gray-400 hidden">Brak zapisanych kosztorysów — wygeneruj pierwszy powyżej.</p>
     </section>
   `;
 
@@ -230,26 +250,33 @@ async function renderEstimatesView(container) {
   const form = container.querySelector('#estimateForm');
   const errorEl = container.querySelector('#estError');
   const listEl = container.querySelector('#estimatesList');
+  const emptyEl = container.querySelector('#estimatesEmpty');
 
   async function loadEstimates() {
     const estimates = await apiFetch('/estimates');
     listEl.innerHTML = '';
-
-    if (estimates.length === 0) {
-      listEl.textContent = 'Brak zapisanych kosztorysów.';
-      return;
-    }
+    emptyEl.classList.toggle('hidden', estimates.length > 0);
 
     estimates.forEach((estimate) => {
       const row = document.createElement('div');
-      row.className = 'border rounded p-3 cursor-pointer hover:bg-gray-50';
+      row.className =
+        'border border-gray-200 dark:border-gray-700 rounded p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50';
 
       const header = document.createElement('div');
       header.className = 'flex justify-between items-center gap-3';
 
+      const titleWrap = document.createElement('div');
+      titleWrap.className = 'flex items-center gap-2';
+
+      const chevron = document.createElement('span');
+      chevron.innerHTML = ICON_CHEVRON_DOWN;
+
       const titleSpan = document.createElement('span');
       titleSpan.className = 'font-medium';
       titleSpan.textContent = estimate.title;
+
+      titleWrap.appendChild(chevron);
+      titleWrap.appendChild(titleSpan);
 
       const rightSide = document.createElement('div');
       rightSide.className = 'flex items-center gap-3';
@@ -282,8 +309,9 @@ async function renderEstimatesView(container) {
 
       const deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
-      deleteBtn.textContent = 'Usuń';
-      deleteBtn.className = 'text-red-600 hover:underline text-sm';
+      deleteBtn.setAttribute('aria-label', 'Usuń kosztorys');
+      deleteBtn.className = `${ICON_BUTTON_CLASS} text-red-600 dark:text-red-400`;
+      deleteBtn.innerHTML = ICON_TRASH;
       deleteBtn.addEventListener('click', async (event) => {
         event.stopPropagation();
         await apiFetch(`/estimates/${estimate.id}`, { method: 'DELETE' });
@@ -294,18 +322,19 @@ async function renderEstimatesView(container) {
       rightSide.appendChild(statusSelect);
       rightSide.appendChild(totalSpan);
       rightSide.appendChild(deleteBtn);
-      header.appendChild(titleSpan);
+      header.appendChild(titleWrap);
       header.appendChild(rightSide);
       row.appendChild(header);
 
       const details = document.createElement('div');
-      details.className = 'mt-2 hidden text-sm text-gray-600';
+      details.className = 'mt-2 hidden text-sm text-gray-600 dark:text-gray-300';
       details.addEventListener('click', (event) => event.stopPropagation());
       row.appendChild(details);
 
       row.addEventListener('click', async () => {
         const wasHidden = details.classList.contains('hidden');
         details.classList.toggle('hidden');
+        chevron.firstElementChild.classList.toggle('rotate-180', wasHidden);
         if (wasHidden) {
           await renderItemsEditor(details, estimate.id, totalSpan);
         }
@@ -319,7 +348,7 @@ async function renderEstimatesView(container) {
     event.preventDefault();
     errorEl.classList.add('hidden');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Generowanie...';
+    submitBtn.innerHTML = `${ICON_SPINNER}<span>Generowanie...</span>`;
 
     try {
       const apiKey = container.querySelector('#estApiKey').value.trim();
@@ -341,7 +370,7 @@ async function renderEstimatesView(container) {
       errorEl.classList.remove('hidden');
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Generuj kosztorys';
+      submitBtn.innerHTML = `${ICON_CLIPBOARD}<span>Generuj kosztorys</span>`;
     }
   });
 
