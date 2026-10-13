@@ -10,18 +10,20 @@ async function renderRatesView(container) {
         ${ICON_BANKNOTES}
         <h2 class="text-xl font-semibold">Twoje stawki</h2>
       </div>
-      <form id="rateForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+      <form id="rateForm" class="space-y-3">
         <input type="hidden" id="rateId" />
         <div>
           <select id="rateCategorySelect" class="${INPUT_CLASS}" required></select>
           <input type="text" id="rateCategoryNew" placeholder="Nazwa nowej kategorii" class="${INPUT_CLASS} mt-2 hidden" />
         </div>
-        <input type="number" id="rateHourly" placeholder="Stawka godzinowa (PLN)" class="${INPUT_CLASS}" step="0.01" required />
-        <input type="number" id="rateMarkup" placeholder="Narzut na materiały (%)" class="${INPUT_CLASS}" step="0.01" value="0" />
-        <button type="submit" id="rateSubmitBtn" class="bg-amber-600 text-white rounded px-3 py-2 hover:bg-amber-700 flex items-center justify-center gap-2">
-          ${ICON_PLUS_CIRCLE}
-          <span>Dodaj stawkę</span>
-        </button>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input type="number" id="rateHourly" placeholder="Stawka godzinowa (PLN)" class="${INPUT_CLASS}" step="0.01" required />
+          <input type="number" id="rateMarkup" placeholder="Narzut na materiały (%)" class="${INPUT_CLASS}" step="0.01" value="0" />
+          <button type="submit" id="rateSubmitBtn" class="bg-amber-600 text-white rounded px-3 py-2 hover:bg-amber-700 flex items-center justify-center gap-2">
+            ${ICON_PLUS_CIRCLE}
+            <span>Dodaj stawkę</span>
+          </button>
+        </div>
       </form>
       <p id="rateError" class="text-red-600 dark:text-red-400 text-sm hidden"></p>
       <table class="w-full text-left border-t border-gray-200 dark:border-gray-700">
