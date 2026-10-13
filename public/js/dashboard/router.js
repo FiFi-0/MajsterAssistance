@@ -1,8 +1,8 @@
 const routes = {};
 const DEFAULT_ROUTE = '/chat';
 
-function registerRoute(path, renderFn, { requiresAuth = false } = {}) {
-  routes[path] = { renderFn, requiresAuth };
+function registerRoute(path, renderFn, { requiresAuth = false, guestOnly = false } = {}) {
+  routes[path] = { renderFn, requiresAuth, guestOnly };
 }
 
 function navigate(path) {
@@ -63,6 +63,11 @@ async function renderRoute() {
 
   if (route.requiresAuth && !isAuthenticated()) {
     navigate('/login');
+    return;
+  }
+
+  if (route.guestOnly && isAuthenticated()) {
+    navigate('/rates');
     return;
   }
 
