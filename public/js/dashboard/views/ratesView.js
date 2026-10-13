@@ -19,10 +19,13 @@ async function renderRatesView(container) {
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <input type="number" id="rateHourly" placeholder="Stawka godzinowa (PLN)" class="${INPUT_CLASS}" step="0.01" required />
           <input type="number" id="rateMarkup" placeholder="Narzut na materiały (%)" class="${INPUT_CLASS}" step="0.01" value="0" />
-          <button type="submit" id="rateSubmitBtn" class="bg-amber-600 text-white rounded px-3 py-2 hover:bg-amber-700 flex items-center justify-center gap-2">
-            ${ICON_PLUS_CIRCLE}
-            <span>Dodaj stawkę</span>
-          </button>
+          <div class="flex gap-2">
+            <button type="submit" id="rateSubmitBtn" class="flex-1 bg-amber-600 text-white rounded px-3 py-2 hover:bg-amber-700 flex items-center justify-center gap-2">
+              ${ICON_PLUS_CIRCLE}
+              <span>Dodaj stawkę</span>
+            </button>
+            <button type="button" id="rateCancelBtn" class="hidden text-sm text-gray-500 dark:text-gray-400 hover:underline px-2">Anuluj</button>
+          </div>
         </div>
       </form>
       <p id="rateError" class="text-red-600 dark:text-red-400 text-sm hidden"></p>
@@ -46,6 +49,7 @@ async function renderRatesView(container) {
   const tbody = container.querySelector('#ratesTableBody');
   const emptyEl = container.querySelector('#ratesEmpty');
   const submitBtn = container.querySelector('#rateSubmitBtn');
+  const cancelBtn = container.querySelector('#rateCancelBtn');
   const idInput = container.querySelector('#rateId');
   const categorySelect = container.querySelector('#rateCategorySelect');
   const categoryNewInput = container.querySelector('#rateCategoryNew');
@@ -79,8 +83,11 @@ async function renderRatesView(container) {
     form.reset();
     idInput.value = '';
     submitBtn.innerHTML = `${ICON_PLUS_CIRCLE}<span>Dodaj stawkę</span>`;
+    cancelBtn.classList.add('hidden');
     updateCategoryNewVisibility();
   }
+
+  cancelBtn.addEventListener('click', resetForm);
 
   async function loadRates() {
     const rates = await apiFetch('/rates');
@@ -119,6 +126,7 @@ async function renderRatesView(container) {
         hourlyInput.value = rate.hourly_rate;
         markupInput.value = rate.material_markup_percent;
         submitBtn.innerHTML = `${ICON_PENCIL}<span>Zapisz zmiany</span>`;
+        cancelBtn.classList.remove('hidden');
       });
 
       const deleteBtn = document.createElement('button');
