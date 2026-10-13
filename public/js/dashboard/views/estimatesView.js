@@ -236,6 +236,7 @@ async function renderEstimatesView(container) {
   const categorySelect = container.querySelector('#estCategory');
   const submitBtn = container.querySelector('#estSubmitBtn');
   container.querySelector('#estApiKey').value = getSavedApiKey();
+  attachPasswordToggle(container.querySelector('#estApiKey'));
   const rates = await apiFetch('/rates');
 
   if (rates.length === 0) {

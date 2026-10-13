@@ -59,6 +59,7 @@ async function renderChatView(container) {
   const materialsItems = container.querySelector('#materialsItems');
 
   apiKeyInput.value = getSavedApiKey();
+  attachPasswordToggle(apiKeyInput);
 
   function renderIconList(listEl, items, icon, formatter) {
     listEl.innerHTML = '';

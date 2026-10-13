@@ -29,6 +29,8 @@ function renderLoginView(container) {
   const form = container.querySelector('#loginForm');
   const errorEl = container.querySelector('#loginError');
 
+  attachPasswordToggle(container.querySelector('#loginPassword'));
+
   tabLogin.textContent = 'Logowanie';
   tabRegister.textContent = 'Rejestracja';
 
